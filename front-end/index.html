@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive course dashboard for the Complete Modern Frontend Engineering Masterclass." />
+  <title>Frontend Masterclass · Course Dashboard</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --brand: #2563eb;
+      --brand-soft: #dbeafe;
+      --radius: 1rem;
+      --shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px rgb(15 23 42 / 0.06);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0b1120;
+      --surface: #111827;
+      --surface-2: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --brand: #60a5fa;
+      --brand-soft: #1e3a8a;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.3);
+    }
+
+    *,
+    *::before,
+    *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 200ms ease, color 200ms ease;
+    }
+
+    a { color: var(--brand); }
+
+    :focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 3px;
+      border-radius: 0.25rem;
+    }
+
+    .shell {
+      width: min(100% - 2rem, 72rem);
+      margin-inline: auto;
+      padding-block: clamp(2rem, 6vw, 5rem);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    h1 {
+      margin: 0.25rem 0 0;
+      font-size: clamp(1.9rem, 1.2rem + 2.5vw, 3rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .lede {
+      max-width: 60ch;
+      margin: 0.75rem 0 0;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.5rem 0.9rem;
+      box-shadow: var(--shadow);
+    }
+
+    .search input {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      width: min(18rem, 55vw);
+      outline: none;
+    }
+
+    .icon-button {
+      display: inline-grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1.15rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .icon-button:hover { border-color: var(--brand); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.6rem;
+      line-height: 1.2;
+    }
+
+    .stat span { color: var(--muted); font-size: 0.9rem; }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+      gap: 1.25rem;
+    }
+
+    .module {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.35rem;
+      box-shadow: var(--shadow);
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .module:hover {
+      transform: translateY(-3px);
+      border-color: var(--brand);
+    }
+
+    .module__number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 0.75rem;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .module h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.3;
+    }
+
+    .module p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      flex: 1;
+    }
+
+    .module a.module__link {
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.92rem;
+    }
+
+    .module a.module__link::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+    }
+
+    .module__files {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .module__files a {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-decoration: none;
+    }
+
+    .module__files a:hover {
+      background: var(--brand-soft);
+      color: var(--brand);
+    }
+
+    .empty {
+      display: none;
+      margin-top: 2rem;
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">Grace Frontend Academy</p>
+        <h1>Complete Modern Frontend Masterclass</h1>
+        <p class="lede">
+          From Git to HTML5, CSS3, and modern JavaScript. Pick a module, open a lesson,
+          and build something every week.
+        </p>
+      </div>
+      <div class="controls">
+        <label class="search">
+          <span aria-hidden="true">🔎</span>
+          <input
+            id="search"
+            type="search"
+            placeholder="Filter modules…"
+            aria-label="Filter modules"
+          />
+        </label>
+        <button
+          id="theme-toggle"
+          class="icon-button"
+          type="button"
+          aria-label="Toggle dark mode"
+          aria-pressed="false"
+        >
+          🌙
+        </button>
+      </div>
+    </div>
+
+    <section class="stats" aria-label="Course statistics">
+      <div class="stat"><strong>7</strong><span>Core modules</span></div>
+      <div class="stat"><strong>30+</strong><span>Lessons &amp; labs</span></div>
+      <div class="stat"><strong>100%</strong><span>Vanilla web platform</span></div>
+      <div class="stat"><strong>3</strong><span>Portfolio projects</span></div>
+    </section>
+
+    <section class="module-grid" id="modules" aria-label="Course modules">
+
+      <article class="module" data-title="overview environment roadmap web">
+        <span class="module__number">00</span>
+        <h2>Course Overview &amp; Setup</h2>
+        <p>Learning roadmap, developer environment, and how the web works.</p>
+        <ul class="module__files">
+          <li><a href="00-course-overview/01-welcome-and-roadmap.md">Roadmap</a></li>
+          <li><a href="00-course-overview/02-developer-environment-setup.md">Setup</a></li>
+          <li><a href="00-course-overview/03-how-the-web-works.md">How the web works</a></li>
+        </ul>
+        <a class="module__link" href="00-course-overview/">Open module →</a>
+      </article>
+
+      <article class="module" data-title="git version control github branching merge rebase">
+        <span class="module__number">01</span>
+        <h2>Version Control with Git</h2>
+        <p>Commits, branching, merging, rebasing, remotes, and collaboration workflows.</p>
+        <ul class="module__files">
+          <li><a href="01-version-control-git/01-git-fundamentals.md">Fundamentals</a></li>
+          <li><a href="01-version-control-git/02-branching-and-merging.md">Branching</a></li>
+          <li><a href="01-version-control-git/git-cheatsheet.md">Cheatsheet</a></li>
+        </ul>
+        <a class="module__link" href="01-version-control-git/">Open module →</a>
+      </article>
+
+      <article class="module" data-title="html html5 semantic forms accessibility seo media">
+        <span class="module__number">02</span>
+        <h2>HTML5 Foundations</h2>
+        <p>Document structure, semantic architecture, accessibility, and SEO.</p>
+        <ul class="module__files">
+          <li><a href="02-html5-foundations/01-html-basics-and-syntax.md">Basics</a></li>
+          <li><a href="02-html5-foundations/02-semantic-html-architecture.md">Semantics</a></li>
+        </ul>
+        <a class="module__link" href="02-html5-foundations/">Open module →</a>
+      </article>
+
+      <article class="module" data-title="css css3 flexbox grid responsive animations cascade">
+        <span class="module__number">03</span>
+        <h2>CSS3 Mastery &amp; Layouts</h2>
+        <p>Cascade, box model, Flexbox, Grid, responsive design, tokens, and animation.</p>
+        <ul class="module__files">
+          <li><a href="03-css3-mastery/01-css-fundamentals-and-cascade.md">Cascade</a></li>
+          <li><a href="03-css3-mastery/03-flexbox-mastery.md">Flexbox</a></li>
+          <li><a href="03-css3-mastery/04-css-grid-mastery.md">Grid</a></li>
+          <li><a href="03-css3-mastery/exercises/css-lab.md">Lab</a></li>
+        </ul>
+        <a class="module__link" href="03-css3-mastery/">Open module →</a>
+      </article>
+
+      <article class="module" data-title="javascript js es6 closures dom async fetch promises">
+        <span class="module__number">04</span>
+        <h2>JavaScript Deep Dive</h2>
+        <p>Execution model, closures, prototypes, DOM, async/await, APIs, and tooling.</p>
+        <ul class="module__files">
+          <li><a href="04-javascript-deep-dive/01-js-fundamentals-and-execution.md">Fundamentals</a></li>
+          <li><a href="04-javascript-deep-dive/05-dom-manipulation-and-events.md">DOM</a></li>
+          <li><a href="04-javascript-deep-dive/06-async-javascript-event-loop.md">Async</a></li>
+          <li><a href="04-javascript-deep-dive/exercises/js-lab.md">Lab</a></li>
+        </ul>
+        <a class="module__link" href="04-javascript-deep-dive/">Open module →</a>
+      </article>
+
+      <article class="module" data-title="projects portfolio kanban weather capstone">
+        <span class="module__number">05</span>
+        <h2>Hands-On Projects</h2>
+        <p>Portfolio site, Kanban board, and a weather dashboard — built from scratch.</p>
+        <ul class="module__files">
+          <li><a href="05-hands-on-projects/README.md">Project briefs</a></li>
+        </ul>
+        <a class="module__link" href="05-hands-on-projects/">Open module →</a>
+      </article>
+
+      <article class="module" data-title="quiz exercises practice test">
+        <span class="module__number">06</span>
+        <h2>Quizzes &amp; Exercises</h2>
+        <p>Self-assessment for CSS and JavaScript with answer keys.</p>
+        <ul class="module__files">
+          <li><a href="06-quizzes-and-exercises/README.md">Quizzes</a></li>
+        </ul>
+        <a class="module__link" href="06-quizzes-and-exercises/">Open module →</a>
+      </article>
+
+      <article class="module" data-title="interview career job prep questions">
+        <span class="module__number">07</span>
+        <h2>Interview &amp; Career Prep</h2>
+        <p>Frontend interview questions, code review, and job-search strategy.</p>
+        <ul class="module__files">
+          <li><a href="07-interview-and-career-prep/README.md">Interview guide</a></li>
+        </ul>
+        <a class="module__link" href="07-interview-and-career-prep/">Open module →</a>
+      </article>
+
+    </section>
+
+    <p class="empty" id="empty">No modules match that search.</p>
+
+    <footer>
+      <p>
+        Built with the web platform: semantic HTML, modern CSS, and vanilla JavaScript.
+        Open <code>README.md</code> for the full curriculum.
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    const root = document.documentElement;
+    const toggle = document.querySelector("#theme-toggle");
+    const search = document.querySelector("#search");
+    const modules = [...document.querySelectorAll(".module")];
+    const empty = document.querySelector("#empty");
+
+    // Theme: saved choice → system preference → light
+    const saved = localStorage.getItem("theme");
+    const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+    const initial = saved ?? (prefersDark ? "dark" : "light");
+    applyTheme(initial);
+
+    toggle.addEventListener("click", () => {
+      const next = root.dataset.theme === "dark" ? "light" : "dark";
+      applyTheme(next);
+      localStorage.setItem("theme", next);
+    });
+
+    function applyTheme(theme) {
+      root.dataset.theme = theme;
+      const isDark = theme === "dark";
+      toggle.textContent = isDark ? "☀️" : "🌙";
+      toggle.setAttribute("aria-pressed", String(isDark));
+      toggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+    }
+
+    // Filter modules by title and keywords
+    search.addEventListener("input", () => {
+      const query = search.value.trim().toLowerCase();
+      let visible = 0;
+
+      for (const module of modules) {
+        const haystack = `${module.dataset.title} ${module.textContent}`.toLowerCase();
+        const match = haystack.includes(query);
+        module.hidden = !match;
+        if (match) visible++;
+      }
+
+      empty.style.display = visible === 0 ? "block" : "none";
+    });
+  </script>
+</body>
+</html>
